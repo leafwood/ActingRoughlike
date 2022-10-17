@@ -22,7 +22,9 @@ void USInteractionComponent::PrimaryInteract()
 	GetOwner()->GetActorEyesViewPoint(EyesLocation,EyesRotation);
 	const FVector End = EyesLocation + EyesRotation.Vector() * 1000.f;
 	FHitResult OutHit;
-	GetWorld()->LineTraceSingleByChannel(OutHit,EyesLocation,End,ECC_Visibility);
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(GetOwner());
+	GetWorld()->LineTraceSingleByChannel(OutHit,EyesLocation,End,ECC_Visibility,CollisionQueryParams);
 
 	//AActor* HitActor = OutHit.GetActor();
 

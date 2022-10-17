@@ -2,6 +2,9 @@
 
 
 #include "SCharacter.h"
+
+#include "DrawDebugHelpers.h"
+#include "ProjectileBase.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -55,14 +58,17 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("Jump",EInputEvent::IE_Pressed,this,&ACharacter::Jump);
-	PlayerInputComponent->BindAction("Attack",EInputEvent::IE_Pressed,this,&ASCharacter::MagicAttack);
+	PlayerInputComponent->BindAction("MagicAttack",EInputEvent::IE_Pressed,this,&ASCharacter::MagicAttack);
+	PlayerInputComponent->BindAction("TeleportAttack",EInputEvent::IE_Pressed,this,&ASCharacter::MagicTeleportAttack);
+	PlayerInputComponent->BindAction("BlackHoleAttack",EInputEvent::IE_Pressed,this,&ASCharacter::MagicBlackHoleAttack);
+	
 	PlayerInputComponent->BindAction("Interact",EInputEvent::IE_Pressed,this,&ASCharacter::Interact);
 
 	PlayerInputComponent->BindAxis("MoveForward",this,&ASCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight",this,&ASCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn",this,&APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("Lookup",this,&APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("lookup",this,&APawn::AddControllerPitchInput);
 
 }
 
@@ -80,19 +86,38 @@ void ASCharacter::MoveRight(float Value)
 	AddMovementInput(MoveDirection * Value);
 }
 
-void ASCharacter::SpawnMagicProjectile()
+void ASCharacter::SpawnMagicProjectile(TSubclassOf<AProjectileBase> Projectile)
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FRotator HandRotation = GetMesh()->GetSocketRotation("Muzzle_01");
-	const FTransform SpawnTrans = FTransform(GetActorRotation(),HandLocation);
+	FRotator HandRotation = GetActorRotation();
+	
+	FHitResult CameraHit;
+
+	FVector CameraStart = Camera->GetComponentLocation();
+	FVector CameraEnd = Camera->GetComponentLocation() + GetControlRotation().Vector() * 10000.f;
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(CameraHit,CameraStart,CameraEnd,ECC_Visibility,CollisionQueryParams);
+	DrawDebugLine(GetWorld(),CameraStart,CameraEnd,FColor::Green,false,2.0f);
+
+	if(CameraHit.bBlockingHit)
+	{
+		HandRotation =  UKismetMathLibrary::FindLookAtRotation(HandLocation,CameraHit.Location);
+	}
+	else
+	{
+		HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation,CameraEnd);
+	}
+	
+	const FTransform SpawnTrans = FTransform(HandRotation,HandLocation);
 	
 	FActorSpawnParameters SpawnParam;
 	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParam.Instigator = this;
 	
-	if(MagicProjectile && GetWorld())
+	if(Projectile && GetWorld())
 	{
-		GetWorld()->SpawnActor<AActor>(MagicProjectile,SpawnTrans,SpawnParam);
+		GetWorld()->SpawnActor<AProjectileBase>(Projectile,SpawnTrans,SpawnParam);
 	}
 }
 
@@ -102,11 +127,28 @@ void ASCharacter::MagicAttack()
 	if(AnimIns && MagicAttackMontage)
 	{
 		AnimIns->Montage_Play(MagicAttackMontage);
-		SpawnMagicProjectile();
+		SpawnMagicProjectile(MagicProjectile);
 	}
+}
 
-	//SpawnMagicProjectile();
-	//GetWorldTimerManager().SetTimer(ProjectileTimer,this,&ASCharacter::SpawnMagicProjectile,0.05f);
+void ASCharacter::MagicTeleportAttack()
+{
+	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	if(AnimIns && TeleportProjectile)
+	{
+		AnimIns->Montage_Play(MagicAttackMontage);
+		SpawnMagicProjectile(TeleportProjectile);
+	}
+}
+
+void ASCharacter::MagicBlackHoleAttack()
+{
+	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	if(AnimIns && BlackHoleProjectile)
+	{
+		AnimIns->Montage_Play(MagicAttackMontage);
+		SpawnMagicProjectile(BlackHoleProjectile);
+	}
 }
 
 void ASCharacter::Interact()

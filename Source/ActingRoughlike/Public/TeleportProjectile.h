@@ -4,28 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "ProjectileBase.h"
-#include "SMagicProjectile.generated.h"
+#include "TeleportProjectile.generated.h"
 
-
-
+/**
+ * 
+ */
 UCLASS()
-class ACTINGROUGHLIKE_API ASMagicProjectile : public AProjectileBase
+class ACTINGROUGHLIKE_API ATeleportProjectile : public AProjectileBase
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ASMagicProjectile();
+	ATeleportProjectile();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-private:
+	virtual void Explode_Implementation() override;
 	
+	UFUNCTION()
+	void TeleportInstigator();
 
+private:
+	FTimerHandle TeleportTimer;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };

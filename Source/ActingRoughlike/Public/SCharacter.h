@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
+class AProjectileBase;
 class UCameraComponent;
 class USpringArmComponent;
 class USInteractionComponent;
@@ -26,12 +27,20 @@ protected:
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-	void SpawnMagicProjectile();
+	void SpawnMagicProjectile(TSubclassOf<AProjectileBase> Projectile);
 
 	void MagicAttack();
+	void MagicTeleportAttack();
+	void MagicBlackHoleAttack();
 
 	UPROPERTY(EditAnywhere,Category = "Attack")
-	TSubclassOf<AActor> MagicProjectile;
+	TSubclassOf<AProjectileBase> MagicProjectile;
+
+	UPROPERTY(EditAnywhere,Category = "Attack")
+	TSubclassOf<AProjectileBase> BlackHoleProjectile;
+
+	UPROPERTY(EditAnywhere,Category = "Attack")
+	TSubclassOf<AProjectileBase> TeleportProjectile;
 
 	UPROPERTY(EditAnywhere,Category = "Attack")
 	UAnimMontage* MagicAttackMontage;
