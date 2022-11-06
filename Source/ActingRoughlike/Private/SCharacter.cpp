@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "SInteractionComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "SAttributeComponent.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -25,11 +26,20 @@ ASCharacter::ASCharacter()
 	Camera->SetupAttachment(CameraBoom);
 
 	InteractionComp = CreateDefaultSubobject<USInteractionComponent>("InteractionComp");
+	
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
 	this->bUseControllerRotationYaw = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
+}
+
+void ASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this,&ASCharacter::OnHealthChanged);
 }
 
 // Called when the game starts or when spawned
@@ -42,8 +52,22 @@ void ASCharacter::BeginPlay()
 float ASCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
+	AttributeComp->ApplyHealthChange(Damage);
+	
 	return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 }
+
+void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwingComp, float NewHealth,
+	float Delta)
+{
+	if(!(NewHealth>0.f))
+	{
+		APlayerController* PController = Cast<APlayerController>(GetController());
+		DisableInput(PController);
+	}
+	GetMesh()->SetScalarParameterValueOnMaterials(FName("TimeToHit"),GetWorld()->TimeSeconds);
+}
+
 
 // Called every frame
 void ASCharacter::Tick(float DeltaTime)
@@ -158,7 +182,3 @@ void ASCharacter::Interact()
 		InteractionComp->PrimaryInteract();
 	}
 }
-
-
-
-

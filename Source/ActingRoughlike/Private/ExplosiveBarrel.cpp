@@ -4,6 +4,7 @@
 #include "ExplosiveBarrel.h"
 
 #include "DrawDebugHelpers.h"
+#include "SAttributeComponent.h"
 #include "PhysicsEngine/RadialForceComponent.h"
 
 // Sets default values
@@ -20,6 +21,11 @@ AExplosiveBarrel::AExplosiveBarrel()
 
 	RadialForce->SetAutoActivate(false);
 	RadialForce->AddCollisionChannelToAffect(ECC_WorldDynamic);
+	RadialForce->Radius = 1000.f;
+
+	ForceRange = CreateDefaultSubobject<USphereComponent>("ForceRange");
+	ForceRange->SetupAttachment(RootComponent);;
+	ForceRange->SetSphereRadius(1000.f);
 
 }
 
@@ -42,6 +48,17 @@ void AExplosiveBarrel::Tick(float DeltaTime)
 void AExplosiveBarrel::Explode()
 {
 	RadialForce->FireImpulse();
+
+	TArray<AActor*> Targets;
+	ForceRange->GetOverlappingActors(Targets);
+	for(auto& target : Targets)
+	{
+		USAttributeComponent* AttributeComp = target->FindComponentByClass<USAttributeComponent>();
+		if(AttributeComp)
+		{
+			AttributeComp->ApplyHealthChange(50);
+		}
+	}
 }
 
 void AExplosiveBarrel::OnSphereOverLap(UPrimitiveComponent* OverlappedComponent,
@@ -56,6 +73,7 @@ void AExplosiveBarrel::OnSphereOverLap(UPrimitiveComponent* OverlappedComponent,
 
 	FString CombinedString = FString::Printf(TEXT("Hit At Location By: %s"),*GetNameSafe(OtherActor));
 	DrawDebugString(GetWorld(),OtherActor->GetActorLocation(),CombinedString,nullptr,FColor::Cyan,2.0f,true);
+
 }
 
 

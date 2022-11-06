@@ -10,6 +10,7 @@ class AProjectileBase;
 class UCameraComponent;
 class USpringArmComponent;
 class USInteractionComponent;
+class USAttributeComponent;
 
 UCLASS()
 class ACTINGROUGHLIKE_API ASCharacter : public ACharacter
@@ -57,10 +58,17 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	USInteractionComponent* InteractionComp;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
+	USAttributeComponent* AttributeComp;
+
 	FTimerHandle ProjectileTimer;
 
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor,USAttributeComponent* OwingComp,float NewHealth,float Delta);
+
+	virtual void PostInitializeComponents() override;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

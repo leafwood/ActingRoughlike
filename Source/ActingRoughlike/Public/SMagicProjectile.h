@@ -6,8 +6,6 @@
 #include "ProjectileBase.h"
 #include "SMagicProjectile.generated.h"
 
-
-
 UCLASS()
 class ACTINGROUGHLIKE_API ASMagicProjectile : public AProjectileBase
 {
@@ -20,6 +18,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 private:
 	

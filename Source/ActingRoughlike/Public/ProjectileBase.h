@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.generated.h"
 
+class USoundCue;
 class USphereComponent;
 class UProjectileMovementComponent;
 
@@ -26,6 +27,18 @@ protected:
 	void Explode();
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Explode")
+	TSubclassOf<UCameraShakeBase> SpellBurstShake;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Explode")
+	UParticleSystem* SpellBurstParticle;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "ExplodeAudio")
+	UAudioComponent* ProjectileLoop;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "ExplodeAudio")
+	USoundCue* ProjectileBurst;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Explode")
 	UParticleSystem* ExplodeParticle;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
@@ -36,13 +49,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovementComp;
+	
+	UFUNCTION()
+	void StartingOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UFUNCTION()
-	virtual void OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
+	void OnCompHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
-private:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Damage")
+	float DamageAmount;
 
+private:
 	
 public:	
 	// Called every frame

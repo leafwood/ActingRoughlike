@@ -4,23 +4,26 @@
 #include "SMagicProjectile.h"
 
 
+#include "Components/SphereComponent.h"
+
+
 // Sets default values
 ASMagicProjectile::ASMagicProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
+	DamageAmount = 30.f;
+	
 }
 
 // Called when the game starts or when spawned
 void ASMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 	
 }
+
+
 
 // Called every frame
 void ASMagicProjectile::Tick(float DeltaTime)
