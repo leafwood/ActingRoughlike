@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "SAICharacter.generated.h"
 
+class USAttributeComponent;
+class UPawnSensingComponent;
+
 UCLASS()
 class ACTINGROUGHLIKE_API ASAICharacter : public ACharacter
 {
@@ -18,6 +21,23 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Attribute")
+	USAttributeComponent* AttributeComp;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "AI")
+	UPawnSensingComponent* SensingComp;
+
+	UFUNCTION()
+	void OnSeePawn(APawn* Player);
+
+	virtual void PostInitializeComponents() override;
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor,
+	USAttributeComponent* OwingComp,
+	float NewHealth,
+	float Delta);
 
 public:	
 	// Called every frame

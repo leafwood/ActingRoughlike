@@ -41,6 +41,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetIsAlive();
 
+	UFUNCTION(BlueprintPure)
+	bool GetIsDying();
+
 private:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Heaalth",meta = (AllowPrivateAccess = true))
 	float MaxHealth;

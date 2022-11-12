@@ -97,6 +97,8 @@ void AProjectileBase::StartingOverlap(UPrimitiveComponent* OverlappedComponent, 
 void AProjectileBase::OnCompHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
+	if(OtherActor == GetInstigator()) return;
+
 	Explode();
 }
 

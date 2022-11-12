@@ -6,6 +6,8 @@
 #include "AIController.h"
 #include "SAIController.generated.h"
 
+
+
 /**
  * 
  */
@@ -14,9 +16,13 @@ class ACTINGROUGHLIKE_API ASAIController : public AAIController
 {
 	GENERATED_BODY()
 	
+	ASAIController();
+	
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "AI")
 	UBehaviorTree* AiBehaviorTree;
+
+	
 };

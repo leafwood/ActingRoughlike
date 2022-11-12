@@ -7,6 +7,13 @@
 #include "BehaviorTree/BlackboardComponent.h"
 
 
+UBTService_CheckRange::UBTService_CheckRange()\
+:AttackReadyRange(3000.f)
+{
+
+	
+}
+
 void UBTService_CheckRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
@@ -22,7 +29,7 @@ void UBTService_CheckRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 			if(ensure(ThisActor))
 			{
 				const float Distance = FVector::Distance(TargetActor->GetActorLocation(),ThisActor->GetActorLocation());
-				const bool TargetWithinRange = Distance < 1000.f;
+				const bool TargetWithinRange = Distance < AttackReadyRange;
 				BBComp->SetValueAsBool(WithinRangeKey.SelectedKeyName,TargetWithinRange);
 				const bool IsInLineOFSight = Controller->LineOfSightTo(TargetActor);
 				BBComp->SetValueAsBool(LineOfSightKey.SelectedKeyName,IsInLineOFSight);

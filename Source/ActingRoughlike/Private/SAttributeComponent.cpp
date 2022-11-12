@@ -44,3 +44,9 @@ bool USAttributeComponent::GetIsAlive()
 {
 	return Health > 0.f;
 }
+
+bool USAttributeComponent::GetIsDying()
+{
+	if(!GetIsAlive()) {return false;}
+	return Health < 30.f;
+}
