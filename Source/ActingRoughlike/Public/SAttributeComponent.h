@@ -21,10 +21,18 @@ public:
 	// Sets default values for this component's properties
 	USAttributeComponent();
 
+	UFUNCTION(BlueprintCallable,Category = "AttributeStatics")
+	static USAttributeComponent* GetAttributeComp(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable,Category = "AttributeStatics")
+	static bool IsActorAlive(AActor* FromActor);
+
 protected:
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Attribute")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Attribute")
 	float Health;
+
+	virtual void BeginPlay() override;
 
 
 public:
@@ -33,7 +41,7 @@ public:
 	FOnHealthChanged OnHealthChanged;
 	
 	UFUNCTION(BlueprintCallable,Category = "AttributeChange")
-	bool ApplyHealthChange(float DeltaDamage);
+	bool ApplyHealthChange(AActor* DamageInstigator,float DeltaDamage);
 
 	UFUNCTION(BlueprintCallable,Category = "AttributeChange")
 	bool HealHealth(float DeltaHeal);
@@ -43,6 +51,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool GetIsDying();
+
+	UFUNCTION()
+	bool Kill(AActor* Instigator);
 
 private:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Heaalth",meta = (AllowPrivateAccess = true))

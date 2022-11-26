@@ -7,6 +7,14 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 #include "ProjectileBase.h"
+#include "SAttributeComponent.h"
+
+UBTTask_AttackInRange::UBTTask_AttackInRange():
+MaxBulletPitchSpread(4.f),
+MaxBulletYawSpread(6.f)
+{
+	
+}
 
 EBTNodeResult::Type UBTTask_AttackInRange::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -20,10 +28,14 @@ EBTNodeResult::Type UBTTask_AttackInRange::ExecuteTask(UBehaviorTreeComponent& O
 		}
 		const FVector MuzzleLocation = Character->GetMesh()->GetSocketLocation("Muzzle_01");
 
+
 		auto TargetActor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TarActor.SelectedKeyName));
-		if(TargetActor)
+		auto ActorIsAlive = USAttributeComponent::IsActorAlive(TargetActor);
+		if(ActorIsAlive)
 		{
 			auto Direction = (TargetActor->GetActorLocation() - MuzzleLocation).Rotation();
+			Direction.Pitch += FMath::RandRange(-MaxBulletPitchSpread,MaxBulletPitchSpread);
+			Direction.Yaw += FMath::RandRange(-MaxBulletYawSpread,MaxBulletYawSpread);
 			
 			FActorSpawnParameters SpawnParam;
 			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -38,3 +50,5 @@ EBTNodeResult::Type UBTTask_AttackInRange::ExecuteTask(UBehaviorTreeComponent& O
 	}
 	return EBTNodeResult::Failed;
 }
+
+

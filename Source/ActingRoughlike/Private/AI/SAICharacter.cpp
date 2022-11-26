@@ -4,12 +4,15 @@
 #include "AI/SAICharacter.h"
 
 #include "AIController.h"
+#include "BrainComponent.h"
 #include "SAttributeComponent.h"
+#include "SWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
 // Sets default values
-ASAICharacter::ASAICharacter()
+ASAICharacter::ASAICharacter():
+ParamName("TimeToHit")
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -28,19 +31,23 @@ void ASAICharacter::BeginPlay()
 	
 }
 
-void ASAICharacter::OnSeePawn(APawn* Player)
+void ASAICharacter::Set_BB_PlayerActor(APawn* Player)
 {
-	auto AIController = Cast<AAIController>(GetController());
+	const auto AIController = Cast<AAIController>(GetController());
 	if(AIController)
 	{
-		auto BlackboardComp = AIController->GetBlackboardComponent();
-		if(ensureMsgf(BlackboardComp,TEXT("AiController BlackBoardComp is Minssing,Please check in the BehaviorTreeComp of the controller")))
+		const auto BlackboardComp = AIController->GetBlackboardComponent();
+		if(ensureMsgf(BlackboardComp,TEXT("AIController BlackBoardComp is Minssing,Please check in the BehaviorTreeComp of the controller")))
 		{
 			BlackboardComp->SetValueAsObject("PlayerActor",Player);
 		}
 	}
 }
 
+void ASAICharacter::OnSeePawn(APawn* Player)
+{
+	Set_BB_PlayerActor(Player);
+}
 
 
 // Called every frame
@@ -69,9 +76,36 @@ void ASAICharacter::PostInitializeComponents()
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwingComp, float NewHealth,
 	float Delta)
 {
-	if(!AttributeComp->GetIsAlive())
+	if(InstigatorActor == this) {return;}
+	
+	if(Delta < 0.f)
 	{
-		Destroy();
+		GetMesh()->SetScalarParameterValueOnMaterials(ParamName,GetWorld()->TimeSeconds);
+
+		if(!ActiveHealthBar)
+		{
+			ActiveHealthBar = CreateWidget<USWorldUserWidget>(GetWorld(),HealthBarWidget);
+			if(ActiveHealthBar)
+			{
+				ActiveHealthBar->SetActorToAttach(this);
+				ActiveHealthBar->AddToViewport();
+			}
+		}
+		
+		if(!AttributeComp->GetIsAlive())
+		{
+			auto AIController = Cast<AAIController>(GetController());
+			if(AIController)
+			{
+				AIController->GetBrainComponent()->StopLogic("Killed");
+			}
+
+			GetMesh()->SetAllBodiesSimulatePhysics(true);
+			GetMesh()->SetCollisionProfileName("Ragdoll");
+			
+			SetLifeSpan(10.f);
+		}
+		Set_BB_PlayerActor(Cast<APawn>(InstigatorActor));
 	}
 }
 

@@ -52,7 +52,7 @@ void ASCharacter::BeginPlay()
 float ASCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	AttributeComp->ApplyHealthChange(Damage);
+	//AttributeComp->ApplyHealthChange(nullptr,Damage);
 	
 	return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 }
@@ -94,6 +94,11 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("Turn",this,&APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("lookup",this,&APawn::AddControllerPitchInput);
 
+}
+
+void ASCharacter::HealUp(float Amount)
+{
+	AttributeComp->HealHealth(Amount);
 }
 
 void ASCharacter::MoveForward(float Value)

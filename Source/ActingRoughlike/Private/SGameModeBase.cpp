@@ -5,6 +5,7 @@
 
 #include "EngineUtils.h"
 #include "SAttributeComponent.h"
+#include "SCharacter.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "AI/SAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
@@ -12,8 +13,9 @@
 ASGameModeBase::ASGameModeBase() :
 QueryDelay(2.f)
 {
-	
 }
+
+
 
 void ASGameModeBase::StartPlay()
 {
@@ -25,6 +27,30 @@ void ASGameModeBase::StartPlay()
 
 void ASGameModeBase::QueryTimerElapsed()
 {
+	int32 NrofAliveBots {0};
+	for(TActorIterator<ASAICharacter> Iter{GetWorld()};Iter;++Iter)
+	{
+		ASAICharacter* Bot = *Iter;
+
+		const auto AttributeComp = Cast<USAttributeComponent>(Bot->GetComponentByClass(USAttributeComponent::StaticClass()));
+		if(ensure(AttributeComp))
+		{
+			if(AttributeComp->GetIsAlive())
+			{
+				NrofAliveBots++;
+			}
+		}
+	}
+
+	float SpawnMaxLimit {10.f};
+		
+	if(SpawnDifficultyCurve)
+	{
+		SpawnMaxLimit = SpawnDifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
+	}
+		
+	if(NrofAliveBots >= SpawnMaxLimit){return;}
+	
 	const auto QueryInstance = UEnvQueryManager::RunEQSQuery(
 		this,GetSpawnLocationQuery,this,EEnvQueryRunMode::RandomBest5Pct,nullptr);
 
@@ -39,32 +65,6 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 {
 	if(QueryStatus == EEnvQueryStatus::Success)
 	{
-
-		int32 NrofAliveBots {0};
-		for(TActorIterator<ASAICharacter> Iter{GetWorld()};Iter;++Iter)
-		{
-			ASAICharacter* Bot = *Iter;
-
-			const auto AttributeComp = Cast<USAttributeComponent>(Bot->GetComponentByClass(USAttributeComponent::StaticClass()));
-			if(ensure(AttributeComp))
-			{
-				if(AttributeComp->GetIsAlive())
-				{
-					NrofAliveBots++;
-				}
-			}
-		}
-
-		float SpawnMaxLimit {10.f};
-		
-		if(SpawnDifficultyCurve)
-		{
-			SpawnMaxLimit = SpawnDifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
-		}
-		
-		if(NrofAliveBots >= SpawnMaxLimit){return;}
-		
-		
 		TArray<FVector> Locations =  QueryInstance->GetResultsAsLocations();
 		if(Locations.Num()>0)
 		{
@@ -73,3 +73,36 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 	}
 }
 
+
+void ASGameModeBase::KillAll()
+{
+	for(TActorIterator<ASAICharacter> Iter{GetWorld()};Iter;++Iter)
+	{
+		USAttributeComponent::GetAttributeComp(*Iter)->Kill(this);
+	}
+}
+
+void ASGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
+{
+	auto Player = Cast<ASCharacter>(Victim);
+	if(Player) [[unlikely]]
+	{
+		FTimerHandle RespawnPlayerTimer;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(this,"RespawnPlayerElapsed",Player->GetController());
+		float RespawnDelay {10.f};
+		GetWorldTimerManager().SetTimer(RespawnPlayerTimer,TimerDelegate,RespawnDelay,false);
+	}
+	
+	UE_LOG(LogTemp,Warning,TEXT("Onactorkilled called,some actor died"));
+}
+
+
+void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)
+{
+	if(ensure(Controller))
+	{
+		Controller->UnPossess();
+		RestartPlayer(Controller);
+	}
+}

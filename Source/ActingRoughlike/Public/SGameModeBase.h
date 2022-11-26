@@ -44,5 +44,14 @@ protected:
 
 	UPROPERTY(EditAnywhere,Category="AI")
 	TSubclassOf<ASAICharacter> AI_BP;
-	
+
+	UFUNCTION()
+	void RespawnPlayerElapsed(AController* Controller);
+
+
+public:
+	UFUNCTION(Exec)
+	void KillAll();
+
+	virtual void OnActorKilled(AActor* Victim,AActor* Killer);
 };

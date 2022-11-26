@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "SAICharacter.generated.h"
 
 class USAttributeComponent;
 class UPawnSensingComponent;
+class USWorldUserWidget;
 
 UCLASS()
 class ACTINGROUGHLIKE_API ASAICharacter : public ACharacter
@@ -21,6 +23,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void Set_BB_PlayerActor(APawn* Player);
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Attribute")
 	USAttributeComponent* AttributeComp;
@@ -38,6 +41,12 @@ protected:
 	USAttributeComponent* OwingComp,
 	float NewHealth,
 	float Delta);
+	
+	UPROPERTY()
+	USWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidget;
 
 public:	
 	// Called every frame
@@ -45,5 +54,11 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+	UPROPERTY(VisibleAnywhere,Category = "Material")
+	FName ParamName;
+
+	
 
 };

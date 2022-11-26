@@ -85,10 +85,10 @@ void AProjectileBase::StartingOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	if(OtherActor == GetInstigator()) return;
 	
-	USAttributeComponent* Attributecomp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+	auto Attributecomp = USAttributeComponent::GetAttributeComp(OtherActor);
 	if(Attributecomp)
 	{
-		Attributecomp->ApplyHealthChange(DamageAmount);
+		Attributecomp->ApplyHealthChange(GetInstigator(),DamageAmount);
 	}
 
 	Explode();

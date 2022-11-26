@@ -47,6 +47,7 @@ void AExplosiveBarrel::Tick(float DeltaTime)
 
 void AExplosiveBarrel::Explode()
 {
+	
 	RadialForce->FireImpulse();
 
 	TArray<AActor*> Targets;
@@ -56,7 +57,7 @@ void AExplosiveBarrel::Explode()
 		USAttributeComponent* AttributeComp = target->FindComponentByClass<USAttributeComponent>();
 		if(AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(50);
+			AttributeComp->ApplyHealthChange(this,50);
 		}
 	}
 }
@@ -69,6 +70,7 @@ void AExplosiveBarrel::OnSphereOverLap(UPrimitiveComponent* OverlappedComponent,
                                        const FHitResult& SweepResult)
 {
 	Explode();
+	BarrelMesh->SetScalarParameterValueOnMaterials("TimeToHit",GetWorld()->TimeSeconds);
 	UE_LOG(LogTemp,Warning,TEXT("OtherActor : %s"),*GetNameSafe(OtherActor));
 
 	FString CombinedString = FString::Printf(TEXT("Hit At Location By: %s"),*GetNameSafe(OtherActor));
