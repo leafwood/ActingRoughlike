@@ -15,7 +15,6 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/um/LMErrlog.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UE4Editor/Inc/ActingRoughlike/ExplosiveBarrel.gen.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UE4Editor/Inc/ActingRoughlike/ProjectileBase.gen.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -324,6 +323,11 @@
       <workItem from="1668393368894" duration="4352000" />
       <workItem from="1668416447539" duration="12482000" />
       <workItem from="1668673722862" duration="3206000" />
+      <workItem from="1669467339204" duration="6994000" />
+      <workItem from="1669476240443" duration="2042000" />
+      <workItem from="1669478493959" duration="37000" />
+      <workItem from="1669605073330" duration="3707000" />
+      <workItem from="1670034991557" duration="531000" />
     </task>
     <servers />
   </component>

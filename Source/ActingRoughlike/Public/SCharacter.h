@@ -69,6 +69,8 @@ private:
 	void OnHealthChanged(AActor* InstigatorActor,USAttributeComponent* OwingComp,float NewHealth,float Delta);
 
 	virtual void PostInitializeComponents() override;
+
+	virtual FVector GetPawnViewLocation() const override;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -78,4 +80,6 @@ public:
 
 	UFUNCTION(Exec)
 	void HealUp(float Amount = 100.f);
+
+	FORCEINLINE UCameraComponent* GetCamera() const {return Camera;}
 };

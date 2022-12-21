@@ -23,6 +23,11 @@
 		{
 			"Name": "HairStrands",
 			"Enabled": true
+		},
+		{
+			"Name": "VirtualAnimationTools",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/afb5d0078ab343b0bfc684d0d05fc951"
 		}
 	]
 }

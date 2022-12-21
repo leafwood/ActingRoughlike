@@ -9,6 +9,7 @@
 #include "SAttributeComponent.h"
 #include "Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
+#include "SGameplayFunctionLibrary.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase():
@@ -85,13 +86,18 @@ void AProjectileBase::StartingOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	if(OtherActor == GetInstigator()) return;
 	
-	auto Attributecomp = USAttributeComponent::GetAttributeComp(OtherActor);
-	if(Attributecomp)
-	{
-		Attributecomp->ApplyHealthChange(GetInstigator(),DamageAmount);
-	}
+	// auto Attributecomp = USAttributeComponent::GetAttributeComp(OtherActor);
+	// if(Attributecomp)
+	// {
+	// 	Attributecomp->ApplyHealthChange(GetInstigator(),DamageAmount);
+	// }
+	//
+	// Explode();
 
+	USGameModeFunctionLibrary::ApplyDirectionalDamage(GetInstigator(),OtherActor,DamageAmount,SweepResult);
+	
 	Explode();
+	
 }
 
 void AProjectileBase::OnCompHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

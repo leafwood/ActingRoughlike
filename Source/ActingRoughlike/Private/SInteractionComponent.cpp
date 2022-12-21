@@ -5,6 +5,8 @@
 #include "DrawDebugHelpers.h"
 #include "SGameplayInterface.h"
 
+static TAutoConsoleVariable<bool> CVarShowDebugInfo(TEXT("FV.ShowInteractionDebug"),true,TEXT("Whether to show debug info like line trace visualization"),ECVF_Cheat);
+
 // Sets default values for this component's properties
 USInteractionComponent::USInteractionComponent()
 {
@@ -46,7 +48,13 @@ void USInteractionComponent::PrimaryInteract()
 				ISGameplayInterface::Execute_Interact(HitActor,Cast<APawn>(GetOwner()));
 			}
 		}
-		DrawDebugSphere(GetWorld(),Hit.Location,30.f,16,FColor::Cyan,false,2.0f);
+
+		bool bShowDebugInfo = CVarShowDebugInfo.GetValueOnGameThread();
+		
+		if(bShowDebugInfo)
+		{
+			DrawDebugSphere(GetWorld(),Hit.Location,30.f,16,FColor::Cyan,false,2.0f);
+		}
 		break;
 	}
 

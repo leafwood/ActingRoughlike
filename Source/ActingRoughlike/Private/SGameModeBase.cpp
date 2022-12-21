@@ -10,12 +10,13 @@
 #include "AI/SAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 
+static TAutoConsoleVariable<bool> CVarDoSpawnBots(TEXT("FV.DoSpawnBots"),true,TEXT("Whether allowed to spanw bots"),ECVF_Cheat);
+
 ASGameModeBase::ASGameModeBase() :
 QueryDelay(2.f)
 {
+	
 }
-
-
 
 void ASGameModeBase::StartPlay()
 {
@@ -27,6 +28,12 @@ void ASGameModeBase::StartPlay()
 
 void ASGameModeBase::QueryTimerElapsed()
 {
+	if(!CVarDoSpawnBots.GetValueOnGameThread())
+	{
+		UE_LOG(LogTemp,Warning,TEXT("Spawn Bots disabled,stop spawning bots."));
+		return;
+	}
+	
 	int32 NrofAliveBots {0};
 	for(TActorIterator<ASAICharacter> Iter{GetWorld()};Iter;++Iter)
 	{

@@ -6,6 +6,8 @@
 #include "SGameModeBase.h"
 #include "GameFramework/Character.h"
 
+static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("FV.DamageMultiplier"),1.f,TEXT("All Damage Ampifier"),ECVF_Cheat);
+
 // Sets default values for this component's properties
 USAttributeComponent::USAttributeComponent()
 : MaxHealth(100.f)
@@ -45,15 +47,15 @@ bool USAttributeComponent::IsActorAlive(AActor* FromActor)
 bool USAttributeComponent::ApplyHealthChange(AActor* DamageInstigator,float DeltaDamage)
 {
 	if(Health == 0.f){return false;}
-	if(!GetOwner()->CanBeDamaged()) {return false;}
+	if(!GetOwner()->CanBeDamaged() && DeltaDamage > 0.f) {return false;}
 	
-	const float DamageAmount = FMath::Clamp(DeltaDamage,0.f,Health);
+	const float DamageAmount = FMath::Clamp(DeltaDamage * CVarDamageMultiplier.GetValueOnGameThread(),0.f,Health);
 	Health -= DamageAmount;
 
 	if(DamageAmount > 0.f && !GetIsAlive())
 	{
 		auto GameMode = GetWorld()->GetAuthGameMode<ASGameModeBase>();
-		if(GameMode) [[likely]]
+		if(GameMode)
 		{
 			GameMode->OnActorKilled(GetOwner(),DamageInstigator);
 		}
