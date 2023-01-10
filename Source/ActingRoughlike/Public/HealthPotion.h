@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PotionBase.h"
+#include "PickupBase.h"
 #include "HealthPotion.generated.h"
 
 /**
@@ -21,8 +21,6 @@ public:
 
 protected:
 	virtual bool ApplyBuffs(APawn* InstigatorPawn) override;
-
-	
 
 private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "HealthChange",meta = (AllowPrivateAccess = true))

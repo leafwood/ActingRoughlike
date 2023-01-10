@@ -24,5 +24,4 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "AI")
 	UBehaviorTree* AiBehaviorTree;
 
-	
 };

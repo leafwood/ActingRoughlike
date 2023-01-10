@@ -6,7 +6,7 @@
 #include "SGameplayInterface.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
-#include "PotionBase.generated.h"
+#include "PickupBase.generated.h"
 
 UCLASS()
 class ACTINGROUGHLIKE_API APotionBase : public AActor,public ISGameplayInterface

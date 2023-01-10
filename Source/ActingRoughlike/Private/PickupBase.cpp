@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PotionBase.h"
+#include "PickupBase.h"
 
 // Sets default values
 APotionBase::APotionBase()
@@ -37,6 +37,10 @@ void APotionBase::Interact_Implementation(APawn* InstigatorPawn)
 			DeactivatePotion();
 			GetWorldTimerManager().SetTimer(PotionReAvailTimer,this,&APotionBase::ReactivatePotion,PotionCD);
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("Potion not available right now"));
 	}
 }
 

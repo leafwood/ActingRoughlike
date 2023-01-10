@@ -24,8 +24,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-
+	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void SpawnMagicProjectile(TSubclassOf<AProjectileBase> Projectile);

@@ -61,7 +61,6 @@ bool USAttributeComponent::ApplyHealthChange(AActor* DamageInstigator,float Delt
 		}
 	}
 	
-
 	OnHealthChanged.Broadcast(DamageInstigator,this,Health,-DamageAmount);
 	
 	return true;

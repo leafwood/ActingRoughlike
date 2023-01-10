@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "SGameModeBase.generated.h"
 
+class ACreditsCoin;
 class UEnvQueryInstanceBlueprintWrapper;
 class UEnvQuery;
 class ASAICharacter;
@@ -31,8 +32,14 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	UEnvQuery* GetSpawnLocationQuery;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UEnvQuery* GetCoinSpawnLocationQuery;
+
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Difficulty")
 	UCurveFloat* SpawnDifficultyCurve;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "PickUpItem")
+	UCurveFloat* CoinSpawnCurve;
 	
 	FTimerHandle QueryTimeHandle;
 
@@ -41,9 +48,15 @@ protected:
 
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	
+	UFUNCTION()
+	void OnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UPROPERTY(EditAnywhere,Category="AI")
 	TSubclassOf<ASAICharacter> AI_BP;
+
+	UPROPERTY(EditAnywhere,Category="PickUps")
+	TSubclassOf<ACreditsCoin> Coin_BP;
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
