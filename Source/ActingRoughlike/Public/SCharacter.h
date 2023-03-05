@@ -11,10 +11,14 @@ class UCameraComponent;
 class USpringArmComponent;
 class USInteractionComponent;
 class USAttributeComponent;
+class USActionComponent;
+class USAction;
 
 UCLASS()
 class ACTINGROUGHLIKE_API ASCharacter : public ACharacter
 {
+
+private:
 	GENERATED_BODY()
 
 public:
@@ -27,11 +31,13 @@ protected:
 	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-	void SpawnMagicProjectile(TSubclassOf<AProjectileBase> Projectile);
 
 	void MagicAttack();
 	void MagicTeleportAttack();
 	void MagicBlackHoleAttack();
+
+	void SprintStart();
+	void SprintStop();
 
 	UPROPERTY(EditAnywhere,Category = "Attack")
 	TSubclassOf<AProjectileBase> MagicProjectile;
@@ -60,7 +66,8 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
 	USAttributeComponent* AttributeComp;
 
-	FTimerHandle ProjectileTimer;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
+	USActionComponent* ActionComp;
 
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -81,4 +88,8 @@ public:
 	void HealUp(float Amount = 100.f);
 
 	FORCEINLINE UCameraComponent* GetCamera() const {return Camera;}
+
+protected:
+	UPROPERTY(EditDefaultsOnly,Category="Action")
+	TArray<TSubclassOf<USAction>> DefaultActions;
 };

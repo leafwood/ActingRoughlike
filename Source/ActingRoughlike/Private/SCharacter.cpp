@@ -11,6 +11,7 @@
 #include "SInteractionComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "SAttributeComponent.h"
+#include "SActionComponent.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -28,6 +29,7 @@ ASCharacter::ASCharacter()
 	InteractionComp = CreateDefaultSubobject<USInteractionComponent>("InteractionComp");
 	
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
+	ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
 
 	this->bUseControllerRotationYaw = false;
 
@@ -51,7 +53,11 @@ FVector ASCharacter::GetPawnViewLocation() const
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	for(auto ActionClass : DefaultActions)
+	{
+		ActionComp->AddAction(ActionClass);
+	}
 }
 
 float ASCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -93,6 +99,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 	PlayerInputComponent->BindAction("Interact",EInputEvent::IE_Pressed,this,&ASCharacter::Interact);
 
+	PlayerInputComponent->BindAction("Sprint",EInputEvent::IE_Pressed,this,&ASCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint",EInputEvent::IE_Released,this,&ASCharacter::SprintStop);
+
 	PlayerInputComponent->BindAxis("MoveForward",this,&ASCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight",this,&ASCharacter::MoveRight);
 
@@ -120,69 +129,48 @@ void ASCharacter::MoveRight(float Value)
 	AddMovementInput(MoveDirection * Value);
 }
 
-void ASCharacter::SpawnMagicProjectile(TSubclassOf<AProjectileBase> Projectile)
-{
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FRotator HandRotation = GetActorRotation();
-	
-	FHitResult CameraHit;
-
-	FVector CameraStart = Camera->GetComponentLocation();
-	FVector CameraEnd = Camera->GetComponentLocation() + GetControlRotation().Vector() * 10000.f;
-	FCollisionQueryParams CollisionQueryParams;
-	CollisionQueryParams.AddIgnoredActor(this);
-	GetWorld()->LineTraceSingleByChannel(CameraHit,CameraStart,CameraEnd,ECC_Visibility,CollisionQueryParams);
-	DrawDebugLine(GetWorld(),CameraStart,CameraEnd,FColor::Green,false,2.0f);
-
-	if(CameraHit.bBlockingHit)
-	{
-		HandRotation =  UKismetMathLibrary::FindLookAtRotation(HandLocation,CameraHit.Location);
-	}
-	else
-	{
-		HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation,CameraEnd);
-	}
-	
-	const FTransform SpawnTrans = FTransform(HandRotation,HandLocation);
-	
-	FActorSpawnParameters SpawnParam;
-	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParam.Instigator = this;
-	
-	if(Projectile && GetWorld())
-	{
-		GetWorld()->SpawnActor<AProjectileBase>(Projectile,SpawnTrans,SpawnParam);
-	}
-}
-
 void ASCharacter::MagicAttack()
 {
-	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
-	if(AnimIns && MagicAttackMontage)
-	{
-		AnimIns->Montage_Play(MagicAttackMontage);
-		SpawnMagicProjectile(MagicProjectile);
-	}
+	// UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	// if(AnimIns && MagicAttackMontage)
+	// {
+	// 	AnimIns->Montage_Play(MagicAttackMontage);
+	// 	SpawnMagicProjectile(MagicProjectile);
+	// }
+	
+	ActionComp->StartActionByName(this,"PrimaryAttack");
 }
 
 void ASCharacter::MagicTeleportAttack()
 {
-	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
-	if(AnimIns && TeleportProjectile)
-	{
-		AnimIns->Montage_Play(MagicAttackMontage);
-		SpawnMagicProjectile(TeleportProjectile);
-	}
+	// UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	// if(AnimIns && TeleportProjectile)
+	// {
+	// 	AnimIns->Montage_Play(MagicAttackMontage);
+	// 	SpawnMagicProjectile(TeleportProjectile);
+	// }
+	ActionComp->StartActionByName(this,"Dash");
 }
 
 void ASCharacter::MagicBlackHoleAttack()
 {
-	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
-	if(AnimIns && BlackHoleProjectile)
-	{
-		AnimIns->Montage_Play(MagicAttackMontage);
-		SpawnMagicProjectile(BlackHoleProjectile);
-	}
+	// UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	// if(AnimIns && BlackHoleProjectile)
+	// {
+	// 	AnimIns->Montage_Play(MagicAttackMontage);
+	// 	SpawnMagicProjectile(BlackHoleProjectile);
+	// }
+	ActionComp->StartActionByName(this,"BlackHole");
+}
+
+void ASCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this,"Sprint");
+}
+
+void ASCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this,"Sprint");
 }
 
 void ASCharacter::Interact()
